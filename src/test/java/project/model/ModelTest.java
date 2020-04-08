@@ -35,6 +35,7 @@ public class ModelTest {
         accountant.setLogin("romashka");
         accountant.setClientName("ООО Ромашка");
         accountant.setClientITN(7701573895L);
+        accountant.setPassword("123");
 
         ClientCreditRequest request = new ClientCreditRequest();
         request.setCreditType(CreditType.INVESTMENT);
@@ -51,6 +52,7 @@ public class ModelTest {
 
         CreditWorker worker = new CreditWorker();
         worker.setLogin("terminator");
+        worker.setPassword("123");
         worker.setLimit(request, (int) (request.getCreditType().equals(CreditType.INVESTMENT) ? ((5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : 2 * request.getProfit()) : (5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : (request.getRevenue() / 6)));
         worker.setDecision(request, worker.getLimit(request) > (request.getSum() + accountant.getLiability()) ? CreditDecision.APPROVE : CreditDecision.DENY);
         accountant.setLiability(worker.getDecision(request).equals(CreditDecision.APPROVE) ? (accountant.getLiability() + request.getSum()) : accountant.getLiability());

@@ -25,6 +25,17 @@ public class ClientAccountant {
     @Column
     private long liability;
 
+    @Column(nullable = false)
+    private String password;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public long getLiability() {
         return liability;
     }

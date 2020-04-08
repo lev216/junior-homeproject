@@ -39,9 +39,9 @@ public class CreditRequestDAO {
 
     }
 
-    public ClientAccountant createClient(long liability, String login, String clientName, long clientITN) {
+    public ClientAccountant createClient(String login, String password, String clientName, long clientITN) {
         ClientAccountant accountant = new ClientAccountant();
-        accountant.setLiability(liability);
+        accountant.setPassword(password);
         accountant.setClientName(clientName);
         accountant.setLogin(login);
         accountant.setClientITN(clientITN);
@@ -56,9 +56,10 @@ public class CreditRequestDAO {
         return accountant;
     }
 
-    public CreditWorker createCreditWorker(String login) {
+    public CreditWorker createCreditWorker(String login, String password) {
         CreditWorker worker = new CreditWorker();
         worker.setLogin(login);
+        worker.setPassword(password);
         manager.getTransaction().begin();
         try {
             manager.persist(worker);
@@ -102,6 +103,17 @@ public class CreditRequestDAO {
 
     }
 
+    public ClientAccountant findClientByLogin(String login) {
+        try {
+            return manager.createQuery("SELECT c from ClientAccountant c WHERE c.login = :clientLoginToSearch", ClientAccountant.class)
+                    .setParameter("clientLoginToSearch", login)
+                    .getSingleResult();
+        } catch (NoResultException exc) {
+            return null;
+        }
+
+    }
+
     public CreditWorker findCreditWorkerByLogin(String login) {
         try {
             return manager.createQuery("SELECT c from CreditWorker c WHERE c.login = :loginToSearch", CreditWorker.class)
@@ -111,6 +123,28 @@ public class CreditRequestDAO {
             return null;
         }
 
+    }
+
+    public List<ClientCreditRequest> findRequestsByCreditWorker(CreditWorker creditWorker) {
+        try {
+            return manager.createQuery("SELECT r from ClientCreditRequest  r WHERE r.worker = :worker", ClientCreditRequest.class)
+                    .setParameter("worker", creditWorker)
+                    .getResultList();
+
+        } catch (NoResultException exc) {
+            return null;
+        }
+    }
+
+    public List<ClientCreditRequest> findRequestsByClient(ClientAccountant client) {
+        try {
+            return manager.createQuery("SELECT r from ClientCreditRequest  r WHERE r.accountant = :accountant", ClientCreditRequest.class)
+                    .setParameter("accountant", client)
+                    .getResultList();
+
+        } catch (NoResultException exc) {
+            return null;
+        }
     }
 
 }

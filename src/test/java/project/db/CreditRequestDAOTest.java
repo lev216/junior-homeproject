@@ -36,9 +36,9 @@ public class CreditRequestDAOTest {
 
     @Test
     public void bigTest() {
-        ClientAccountant accountant = requests.createClient(0, "romashka", "ООО Ромашка", 7705002757L);
+        ClientAccountant accountant = requests.createClient("romashka", "123", "ООО Ромашка", 7705002757L);
         ClientCreditRequest request = requests.createCreditRequest(accountant, CreditType.WORKING, 5000000, 12, 200000000, 15000000, 90000000, 150000000);
-        CreditWorker worker = requests.createCreditWorker("smartGuy");
+        CreditWorker worker = requests.createCreditWorker("smartGuy", "123");
         requests.assignCreditWorkerToRequest(request, worker);
         requests.countLimit(worker, request, accountant);
         requests.makeCreditDecision(worker, request, accountant);
@@ -57,7 +57,7 @@ public class CreditRequestDAOTest {
         assertEquals(CreditDecision.APPROVE, worker.getDecision(request));
 
         try {
-            requests.createCreditWorker("smartGuy");
+            requests.createCreditWorker("smartGuy", "123");
             fail("there is the same login");
         } catch (PersistenceException exc) {
 
