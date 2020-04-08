@@ -45,6 +45,7 @@ public class CreditRequestDAO {
         accountant.setClientName(clientName);
         accountant.setLogin(login);
         accountant.setClientITN(clientITN);
+        accountant.setLiability(0);
         manager.getTransaction().begin();
         try {
             manager.persist(accountant);
