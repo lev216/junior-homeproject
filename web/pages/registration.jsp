@@ -1,20 +1,17 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8"%>
 
+
 <html>
 <head>
     <title>Sign up</title>
 </head>
 <body>
-    <c:out value="${sessionScope['login']}"/>
-
-    <c:set var="test" value="${requestScope.login}"/>
-    <c:out value="${test}"/>
-
-    ${applicationScope.login}
 
 
-    <form action="registration" method="post" enctype="application/x-www-form-urlencoded">
+
+
+    <form action="/jj/registration" method="post" enctype="application/x-www-form-urlencoded">
 
         <p>
             <label>

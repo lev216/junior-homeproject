@@ -34,9 +34,19 @@ public class CreditRequestDAO {
         return request;
     }
 
-    public void assignCreditWorkerToRequest(ClientCreditRequest request, CreditWorker worker) {
-        request.setWorker(worker);
-
+    public void assignCreditWorkerToRequest(int id, CreditWorker worker) {
+        //request.setWorker(worker);
+        try {
+            manager.getTransaction().begin();
+            manager.createQuery("UPDATE ClientCreditRequest c SET c.worker = :workerToUpdate WHERE c.id = :idToSearch")
+                    .setParameter("idToSearch", id)
+                    .setParameter("workerToUpdate", worker)
+                    .executeUpdate();
+        } catch (Throwable exc) {
+            manager.getTransaction().rollback();
+            throw exc;
+        }
+        manager.getTransaction().commit();
     }
 
     public ClientAccountant createClient(String login, String password, String clientName, long clientITN) {
@@ -72,14 +82,69 @@ public class CreditRequestDAO {
         return worker;
     }
 
-    public void makeCreditDecision(CreditWorker worker, ClientCreditRequest request, ClientAccountant accountant) {
-        worker.setDecision(request, worker.getLimit(request) > (request.getSum() + accountant.getLiability()) ? CreditDecision.APPROVE : CreditDecision.DENY);
+    public void makeCreditDecision(ClientCreditRequest request, ClientAccountant accountant) {
+        //worker.setDecision(request, worker.getLimit(request) > (request.getSum() + accountant.getLiability()) ? CreditDecision.APPROVE : CreditDecision.DENY);
+        CreditDecision decision;
+        int id = request.getId();
+        if (request.getLimit() > (request.getSum() + accountant.getLiability())) {
+            decision = CreditDecision.APPROVE;
+        } else {
+            decision = CreditDecision.DENY;
+        }
+        try {
+            manager.getTransaction().begin();
+            manager.createQuery("UPDATE ClientCreditRequest c SET c.decision = :decisionToUpdate WHERE c.id = :idToSearch")
+                    .setParameter("idToSearch", id)
+                    .setParameter("decisionToUpdate", decision)
+                    .executeUpdate();
+        } catch (Throwable exc) {
+            manager.getTransaction().rollback();
+            throw exc;
+        }
+        manager.getTransaction().commit();
+        request.setDecision(decision);
+        if (decision.equals(CreditDecision.APPROVE)) {
+            long presentLiability = accountant.getLiability() + request.getSum();
+            int idAcc = accountant.getId();
+            try {
+                manager.getTransaction().begin();
+                manager.createQuery("UPDATE ClientAccountant c SET c.liability = :liabilityToUpdate WHERE c.id = :idToSearch")
+                        .setParameter("idToSearch", idAcc)
+                        .setParameter("liabilityToUpdate", presentLiability)
+                        .executeUpdate();
+            } catch (Throwable exc) {
+                manager.getTransaction().rollback();
+                throw exc;
+            }
+            manager.getTransaction().commit();
+            accountant.setLiability(presentLiability);
+        }
 
     }
 
-    public void countLimit(CreditWorker worker, ClientCreditRequest request, ClientAccountant accountant) {
-        worker.setLimit(request, (int) (request.getCreditType().equals(CreditType.INVESTMENT) ? ((5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : 2 * request.getProfit()) : (5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : (request.getRevenue() / 6)));
+    public void countLimit(ClientCreditRequest request) {
+        //worker.setLimit(request, (int) (request.getCreditType().equals(CreditType.INVESTMENT) ? ((5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : 2 * request.getProfit()) : (5 * request.getNetAssets() - request.getTotalAssets()) < 2 * request.getProfit() ? (5 * request.getNetAssets() - request.getTotalAssets()) : (request.getRevenue() / 6)));
+        int limit;
+        int id = request.getId();
+        int restriction = 5 * request.getNetAssets() - request.getTotalAssets();
+        if (request.getCreditType().equals(CreditType.INVESTMENT)) {
+            limit = Math.min(restriction, 2 * request.getProfit());
 
+        } else {
+            limit = Math.min(restriction, (int) (request.getRevenue() / 6));
+        }
+        try {
+            manager.getTransaction().begin();
+            manager.createQuery("UPDATE ClientCreditRequest c SET c.limit = :limitToUpdate WHERE c.id = :idToSearch")
+                    .setParameter("idToSearch", id)
+                    .setParameter("limitToUpdate", limit)
+                    .executeUpdate();
+        } catch (Throwable exc) {
+            manager.getTransaction().rollback();
+            throw exc;
+        }
+        manager.getTransaction().commit();
+        request.setLimit(limit);
     }
 
     public ClientCreditRequest findRequestById(int id) {
@@ -142,6 +207,28 @@ public class CreditRequestDAO {
             return manager.createQuery("SELECT r from ClientCreditRequest  r WHERE r.accountant = :accountant", ClientCreditRequest.class)
                     .setParameter("accountant", client)
                     .getResultList();
+
+        } catch (NoResultException exc) {
+            return null;
+        }
+    }
+
+    public List<ClientCreditRequest> findAllRequests() {
+        try {
+            return manager.createQuery("SELECT r from ClientCreditRequest  r", ClientCreditRequest.class)
+
+                    .getResultList();
+
+        } catch (NoResultException exc) {
+            return null;
+        }
+    }
+
+    public List<String> findAllWorkerLogins() {
+        try {
+            return manager.createQuery("SELECT w.login from CreditWorker w", String.class).getResultList();
+
+
 
         } catch (NoResultException exc) {
             return null;

@@ -16,19 +16,14 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = "/registration")
+@WebServlet(urlPatterns = "/")
 public class RegistrationServlet extends HttpServlet {
     ClientAccountant client;
     CreditWorker worker;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
-        ServletContext context = getServletContext();
-        session.setAttribute("login", "user0");
-        context.setAttribute("login", "user1");
-        req.setAttribute("login", "user2");
-        req.getRequestDispatcher("/registration.jsp").forward(req, resp);
+        req.getRequestDispatcher("/pages/registration.jsp").forward(req, resp);
     }
 
     @Override
@@ -36,49 +31,52 @@ public class RegistrationServlet extends HttpServlet {
 
         EntityManager manager = PersistenceUtils.createManager(req.getServletContext());
         CreditRequestDAO requests = new CreditRequestDAO(manager);
-        String type = req.getParameter("typeField");
-//        try {
 
+        String type = req.getParameter("typeField");
+        try {
 
             String login = req.getParameter("loginField");
             String password = req.getParameter("passwordField");
-            //type = req.getParameter("typeField");
             HttpSession session = req.getSession(true);
-            session.setAttribute("auth", login);
+            session.setAttribute("login", login);
+            String loginBoss = "boss";
+            if (requests.findCreditWorkerByLogin(loginBoss) == null) {
+                CreditWorker boss = requests.createCreditWorker(loginBoss, "123");
+                session.setAttribute("boss", loginBoss);
+            }
             long clientITN;
             String clientName;
 
+//            try {
+                if (type.equals("Client")) {
 
-            if (type.equals("Client")) {
-                try {
                     clientITN = Long.parseLong(req.getParameter("clientITNField"));
                     clientName = req.getParameter("clientNameField");
                     client = requests.createClient(login, password, clientName, clientITN);
-                } catch (NumberFormatException exc) {
-
+                } else if (type.equals("Worker"))  {
+                    worker = requests.createCreditWorker(login, password);
                 }
-
-
-            } else if (type.equals("Worker"))  {
-                worker = requests.createCreditWorker(login, password);
-            }
-
-
+//            } catch (NumberFormatException exc) {
+//
+//            } catch (NullPointerException exc) {
+//
+//            }
 
             if (req.getParameter("registrationButton") != null && type.equals("Client")) {
-                resp.sendRedirect(req.getContextPath() + "/clientInterface.jsp");
+                resp.sendRedirect(req.getContextPath() + "/clientInterface");
             } else if (req.getParameter("registrationButton") != null && type.equals("Worker")) {
-                resp.sendRedirect(req.getContextPath() + "/workerInterface.jsp");
+                resp.sendRedirect(req.getContextPath() + "/workerInterface");
+
             } else if (req.getParameter("toLoginButton") != null) {
-                resp.sendRedirect(req.getContextPath() + "/login.jsp");
+                resp.sendRedirect(req.getContextPath() + "/login");
             } else {
                 resp.sendError(400, "Something's wrong");
             }
-//        } catch (Exception exc) {
-//            resp.sendError(400, "You've just fucked up");
-//        } finally {
-//            manager.close();
-//        }
+        } catch (Exception exc) {
+            resp.sendError(400, "You've just fucked up");
+        } finally {
+            manager.close();
+        }
 
     }
 }

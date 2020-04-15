@@ -5,7 +5,7 @@
     <title>Login</title>
 </head>
 <body>
-    <form action="login" method="post" enctype="application/x-www-form-urlencoded">
+    <form action="/jj/login" method="post" enctype="application/x-www-form-urlencoded">
         <p>
             <label>
                 Login:

@@ -39,9 +39,10 @@ public class CreditRequestDAOTest {
         ClientAccountant accountant = requests.createClient("romashka", "123", "ООО Ромашка", 7705002757L);
         ClientCreditRequest request = requests.createCreditRequest(accountant, CreditType.WORKING, 5000000, 12, 200000000, 15000000, 90000000, 150000000);
         CreditWorker worker = requests.createCreditWorker("smartGuy", "123");
-        requests.assignCreditWorkerToRequest(request, worker);
-        requests.countLimit(worker, request, accountant);
-        requests.makeCreditDecision(worker, request, accountant);
+        //requests.assignCreditWorkerToRequest(request, worker);
+        request.setWorker(worker);
+        requests.countLimit(request);
+        requests.makeCreditDecision(request, accountant);
         assertNotNull(accountant);
         assertNotNull(request);
         assertNotNull(worker);
@@ -53,7 +54,7 @@ public class CreditRequestDAOTest {
         //оборот 33333333
         //инвест 30000000
         assertNotEquals("dumpGuy", worker.getLogin());
-        assertEquals(33333333, worker.getLimit(request));
+        assertEquals(33333333, request.getLimit());
         assertEquals(CreditDecision.APPROVE, worker.getDecision(request));
 
         try {

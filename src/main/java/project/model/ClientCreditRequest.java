@@ -122,4 +122,20 @@ public class ClientCreditRequest {
     public void setTotalAssets(int totalAssets) {
         this.totalAssets = totalAssets;
     }
+
+    public CreditDecision getDecision() {
+        return decision;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public void setDecision(CreditDecision decision) {
+        this.decision = decision;
+    }
 }

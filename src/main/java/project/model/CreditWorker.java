@@ -52,4 +52,7 @@ public class CreditWorker {
         request.limit = limit;
     }
 
+    public int getId() {
+        return id;
+    }
 }
