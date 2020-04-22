@@ -2,8 +2,15 @@ package project.db;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import project.model.*;
+import project.tests.TestConfiguration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,28 +18,34 @@ import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
 import static org.junit.Assert.*;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = TestConfiguration.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CreditRequestDAOTest {
-    private EntityManagerFactory factory;
-    private EntityManager manager;
-    private CreditRequestDAO requests;
-
-    @Before
-    public void connect() {
-        factory = Persistence.createEntityManagerFactory("TestPersistenceUnit");
-        manager = factory.createEntityManager();
-        requests = new CreditRequestDAO(manager);
-
-    }
-
-    @After
-    public void close() {
-        if (manager != null) {
-            manager.close();
-        }
-        if (factory != null) {
-            factory.close();
-        }
-    }
+//    private EntityManagerFactory factory;
+//    private EntityManager manager;
+//    private CreditRequestDAO requests;
+//
+//    @Before
+//    public void connect() {
+//        factory = Persistence.createEntityManagerFactory("TestPersistenceUnit");
+//        manager = factory.createEntityManager();
+//        requests = new CreditRequestDAO(manager);
+//
+//    }
+//
+//    @After
+//    public void close() {
+//        if (manager != null) {
+//            manager.close();
+//        }
+//        if (factory != null) {
+//            factory.close();
+//        }
+//    }
+    @Autowired
+    public CreditRequestDAO requests;
 
     @Test
     public void bigTest() {
@@ -76,9 +89,9 @@ public class CreditRequestDAOTest {
         assertNotNull(foundWorker);
         assertEquals(worker.getLogin(), foundWorker.getLogin());
 
-        ClientAccountant foundClientById = manager.find(ClientAccountant.class, accountant.getId());
-        ClientCreditRequest foundRequestById = manager.find(ClientCreditRequest.class, request.getId());
-        manager.refresh(foundClientById);
-        manager.refresh(foundRequestById);
+//        ClientAccountant foundClientById = manager.find(ClientAccountant.class, accountant.getId());
+//        ClientCreditRequest foundRequestById = manager.find(ClientCreditRequest.class, request.getId());
+//        manager.refresh(foundClientById);
+//        manager.refresh(foundRequestById);
     }
 }

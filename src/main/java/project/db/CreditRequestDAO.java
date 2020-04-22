@@ -1,13 +1,16 @@
 package project.db;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import project.model.*;
 
 import javax.persistence.*;
 import java.util.*;
-
+@Repository
 public class CreditRequestDAO {
-    private EntityManager manager;
+    private final EntityManager manager;
 
+    @Autowired
     public CreditRequestDAO(EntityManager manager) {
         Objects.requireNonNull(manager, "EntityManager shouldn't be null");
         this.manager = manager;
