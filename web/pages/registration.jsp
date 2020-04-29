@@ -1,5 +1,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8"%>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 
 
 <html>
@@ -12,7 +13,7 @@
 
 
     <form action="/jj/registration" method="post" enctype="application/x-www-form-urlencoded">
-
+        <security:csrfInput/>
         <p>
             <label>
                 Login:

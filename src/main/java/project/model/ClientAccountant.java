@@ -1,6 +1,11 @@
 package project.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 @Entity
@@ -11,12 +16,17 @@ public class ClientAccountant {
     private int id;
 
     @Column(length = 50, nullable = false, unique = true)
+    @Size(min = 4, max = 50, message = "Login should be at least 4 characters length")
+    @Pattern(regexp = "[a-zA-Z-_.0-9]*",
+            message = "Only letters, digits, underscore, minus sign and dots are allowed in login")
     private String login;
 
     @Column(nullable = false)
     private String clientName;
 
     @Column(nullable = false, unique = true)
+    @Positive
+    //@Size(min = 10)
     private long clientITN;
 
     @OneToMany(mappedBy = "accountant")
@@ -26,14 +36,16 @@ public class ClientAccountant {
     private long liability;
 
     @Column(nullable = false)
-    private String password;
+    @JsonIgnore
+    @Size(min = 3, max = 70, message = "Password should be at least 3 characters length")
+    private String encodedPassword;
 
-    public String getPassword() {
-        return password;
+    public String getEncodedPassword() {
+        return encodedPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setEncodedPassword(String password) {
+        this.encodedPassword = password;
     }
 
     public long getLiability() {

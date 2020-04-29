@@ -1,12 +1,14 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8"%>
 <jsp:useBean id="login" class="java.lang.String" scope="session"/>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <html>
 <head>
     <title>Creation of credit request</title>
 </head>
 <body>
     <form action="/jj/request" method="post" enctype="application/x-www-form-urlencoded">
+        <security:csrfInput/>
         <p>
             <label>
                 ${login}, fill all the fields for creating your credit request

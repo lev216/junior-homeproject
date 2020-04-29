@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import project.db.CreditRequestDAO;
 
 import javax.persistence.EntityManagerFactory;
@@ -18,6 +19,7 @@ public class StartupListener {
     private CreditRequestDAO requests;
 
     @EventListener
+    @Transactional
     public void applicationStarted(ContextRefreshedEvent event) {
 //        EntityManagerFactory factory = Persistence.createEntityManagerFactory("ProdPersistenceUnit");
 //        sce.getServletContext().setAttribute("factory", factory);

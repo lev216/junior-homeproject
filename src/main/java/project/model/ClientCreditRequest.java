@@ -1,6 +1,8 @@
 package project.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 @Entity
 @Table
@@ -44,24 +46,36 @@ public class ClientCreditRequest {
     }
 
     @Column
+    @Positive
+    @NotNull
+
     private long sum;
 
     @Column
+    @Positive
+    @NotNull
     private int term;
 
     @Column
+    @Positive
+    @NotNull
     private long revenue;
 
     @Column
+    @NotNull
     private int profit;
 
     @Column
+    @NotNull
     private int netAssets;
 
     @Column
+    @Positive
+    @NotNull
     private int totalAssets;
 
     @Column(name = "maxLimit")
+
     public int limit;
 
     @Enumerated(EnumType.STRING)

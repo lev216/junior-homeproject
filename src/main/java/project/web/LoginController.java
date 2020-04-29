@@ -1,7 +1,9 @@
 package project.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,14 +11,7 @@ import project.db.CreditRequestDAO;
 import project.model.ClientAccountant;
 import project.model.CreditWorker;
 
-import javax.persistence.EntityManager;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 
 //@WebServlet(urlPatterns = "/login")
 @Controller
@@ -27,6 +22,9 @@ public class LoginController {
     @Autowired
     private CreditRequestDAO requests;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @GetMapping(path = "/login")
     public String getLoginForm() {
         //req.getRequestDispatcher("/pages/login.jsp").forward(req, resp);
@@ -34,6 +32,7 @@ public class LoginController {
     }
 
     @PostMapping(path = "/login")
+    @Transactional
     public String processLoginForm(HttpSession session,
                                    @RequestParam("loginField") String login,
                                    @RequestParam("passwordField") String password,
@@ -76,9 +75,9 @@ public class LoginController {
             client = requests.findClientByLogin(login);
             worker = requests.findCreditWorkerByLogin(login);
             session.setAttribute("login", login);
-            if (client != null && password.equals(client.getPassword()) && loginButton != null) {
+            if (client != null && encoder.matches(password, client.getEncodedPassword()) && loginButton != null) {
                 return "redirect:/clientInterface";
-            } else if (worker != null && password.equals(worker.getPassword()) && loginButton != null) {
+            } else if (worker != null && encoder.matches(password, worker.getEncodedPassword()) && loginButton != null) {
                 return "redirect:/workerInterface";
             } else if (registrationButton != null) {
                 return "redirect:/";
@@ -87,4 +86,5 @@ public class LoginController {
             }
         }
     }
+
 }

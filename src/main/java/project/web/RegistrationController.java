@@ -1,9 +1,14 @@
 package project.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import project.db.CreditRequestDAO;
@@ -32,6 +37,9 @@ public class RegistrationController {
     ClientAccountant client;
     CreditWorker worker;
 
+    @Autowired
+    private PasswordEncoder encoder;
+
     @GetMapping(path = "/")
     public String getRegistrationForm() {
 //        req.getRequestDispatcher("/pages/registration.jsp").forward(req, resp);
@@ -39,28 +47,33 @@ public class RegistrationController {
     }
 
     @PostMapping("registration")
+    @Transactional
     public String processRegistrationForm(HttpSession session,
-                         @RequestParam(name = "typeField") String type,
-                         @RequestParam(name = "loginField") String login,
-                         @RequestParam(name = "passwordField") String password,
-                         @RequestParam(name = "clientITNField") Long clientITN,
-                         @RequestParam(name = "clientNameField") String clientName,
-                         @RequestParam(required = false) String registrationButton,
-                         @RequestParam(required = false) String toLoginButton) {
+                                          @RequestParam(name = "typeField") String type,
+                                          @RequestParam(name = "loginField") String login,
+                                          @RequestParam(name = "passwordField") String password,
+                                          @RequestParam(name = "clientITNField") Long clientITN,
+                                          @RequestParam(name = "clientNameField") String clientName,
+                                          @RequestParam(required = false) String registrationButton,
+                                          @RequestParam(required = false) String toLoginButton) {
 
             session.setAttribute("login", login);
             String loginBoss = "boss";
             if (requests.findCreditWorkerByLogin(loginBoss) == null) {
-                CreditWorker boss = requests.createCreditWorker(loginBoss, "123");
+                CreditWorker boss = requests.createCreditWorker(loginBoss, encoder.encode("123"));
                 session.setAttribute("boss", loginBoss);
             }
+            String encodedPassword = encoder.encode(password);
+
 
             if (registrationButton != null && type.equals("Client")) {
-                client = requests.createClient(login, password, clientName, clientITN);
+
+                client = requests.createClient(login, encodedPassword, clientName, clientITN);
                 return "redirect:/clientInterface";
 
+
             } else if (registrationButton != null && type.equals("Worker")) {
-                worker = requests.createCreditWorker(login, password);
+                worker = requests.createCreditWorker(login, encodedPassword);
                 return "redirect:/workerInterface";
 
             } else if (toLoginButton != null) {

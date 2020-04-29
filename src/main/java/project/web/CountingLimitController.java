@@ -2,6 +2,7 @@ package project.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,7 @@ public class CountingLimitController {
     }
 
     @PostMapping("/countingLimit")
+    @Transactional
     public String processCountingLimitForm(ModelMap model,
                                            @RequestParam(required = false) String cancelButton,
                                            @RequestParam(name = "idWorkerRequests", required = false) Integer idWorkerRequest,

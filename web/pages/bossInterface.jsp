@@ -2,6 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <jsp:useBean id="boss" class="java.lang.String" scope="session"/>
 <jsp:useBean id="allRequests" class="java.util.ArrayList" scope="request"/>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 
 <html>
 <head>
@@ -20,6 +21,7 @@
 </head>
 <body>
 <form action="/jj/bossInterface" method="post" enctype="application/x-www-form-urlencoded">
+    <security:csrfInput/>
     <p>
         <label>
             Hello, ${boss}!

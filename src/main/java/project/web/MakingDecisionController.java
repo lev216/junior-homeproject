@@ -2,6 +2,7 @@ package project.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ public class MakingDecisionController {
     private CreditRequestDAO requests;
 
     @GetMapping("/makingDecision")
+    @Transactional
     public String getMakingDecisionFrom(HttpSession session, ModelMap model) {
 
         ArrayList<ClientCreditRequest> allWorkerRequests = new ArrayList<>(requests.findRequestsByCreditWorker(requests.findCreditWorkerByLogin((String) session.getAttribute("login"))));
@@ -42,6 +44,7 @@ public class MakingDecisionController {
     }
 
     @PostMapping("/makingDecision")
+    @Transactional
     public String processMakingDecisionForm(@RequestParam(required = false) String cancelButton,
                                             @RequestParam(required = false) String makingDecisionButton,
                                             @RequestParam(name = "idWorkerRequests", required = false) Integer idWorkerRequest) {
